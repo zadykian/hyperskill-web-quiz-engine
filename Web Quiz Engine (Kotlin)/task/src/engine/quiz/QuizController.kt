@@ -10,6 +10,6 @@ class QuizController(@Autowired private val engine: QuizEngine) {
     @GetMapping
     fun get() = engine.getNew()
 
-    @PostMapping("/{answer}")
-    fun answer(@PathVariable answer: Int) = engine.checkAnswer(answer)
+    @PostMapping
+    fun answer(@RequestParam answer: Int) = engine.checkAnswer(answer)
 }

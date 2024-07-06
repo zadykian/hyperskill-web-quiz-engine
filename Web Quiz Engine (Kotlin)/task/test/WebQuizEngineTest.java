@@ -13,24 +13,28 @@ import static org.hyperskill.hstest.testing.expect.Expectation.expect;
 import static org.hyperskill.hstest.testing.expect.json.JsonChecker.*;
 
 public class WebQuizEngineTest extends SpringTest {
+    @DynamicTestingMethod
+    public DynamicTesting[] dt = new DynamicTesting[]{
+            this::checkQuizReceived,
+            () -> checkQuizSuccess("2", true),
+            () -> checkQuizSuccess("1", false)
+    };
+
     static void checkStatusCode(HttpResponse resp, int status) {
         if (resp.getStatusCode() != status) {
             throw new WrongAnswer(
-                resp.getRequest().getMethod() + " " +
-                    resp.getRequest().getLocalUri() +
-                    " should respond with status code " + status + ", " +
-                    "responded: " + resp.getStatusCode() + "\n\n" +
-                    "Response body:\n\n" + resp.getContent()
+                    resp.getRequest().getMethod() + " " +
+                            resp.getRequest().getLocalUri() +
+                            " should respond with status code " + status + ", " +
+                            "responded: " + resp.getStatusCode() + "\n\n" +
+                            "Response body:\n\n" + resp.getContent()
             );
         }
     }
 
-    @DynamicTestingMethod
-    public DynamicTesting[] dt = new DynamicTesting[] {
-        this::checkQuizReceived,
-        () -> checkQuizSuccess("2", true),
-        () -> checkQuizSuccess("1", false)
-    };
+    private static JsonStringBuilder isNotBlankString() {
+        return isString(s -> !s.isBlank(), "should not be blank");
+    }
 
     private CheckResult checkQuizReceived() {
         String url = "/api/quiz";
@@ -39,10 +43,10 @@ public class WebQuizEngineTest extends SpringTest {
         checkStatusCode(resp, 200);
 
         expect(resp.getContent()).asJson().check(
-            isObject()
-                .value("title", isNotBlankString())
-                .value("text", isNotBlankString())
-                .value("options", isArray(4, isNotBlankString()))
+                isObject()
+                        .value("title", isNotBlankString())
+                        .value("text", isNotBlankString())
+                        .value("options", isArray(4, isNotBlankString()))
         );
 
         return CheckResult.correct();
@@ -57,15 +61,11 @@ public class WebQuizEngineTest extends SpringTest {
         checkStatusCode(resp, 200);
 
         expect(resp.getContent()).asJson().check(
-            isObject()
-                .value("success", shouldResponse)
-                .value("feedback", isNotBlankString())
+                isObject()
+                        .value("success", shouldResponse)
+                        .value("feedback", isNotBlankString())
         );
 
         return CheckResult.correct();
-    }
-
-    private static JsonStringBuilder isNotBlankString() {
-        return isString(s -> !s.isBlank(), "should not be blank");
     }
 }
