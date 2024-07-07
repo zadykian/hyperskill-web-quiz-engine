@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$hs.kotlin.version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0"
     }
 }
 
@@ -27,6 +27,12 @@ subprojects {
         }
     }
 
+    kotlin {
+        compilerOptions {
+            freeCompilerArgs = ["-Xcontext-receivers"]
+        }
+    }
+
     compileTestJava {
         javaCompiler = javaToolchains.compilerFor {
             languageVersion = JavaLanguageVersion.of(testJava)
@@ -40,6 +46,7 @@ subprojects {
     }
 
     dependencies {
+        implementation 'io.arrow-kt:arrow-core:1.2.4'
         testImplementation 'com.github.hyperskill:hs-test:release-SNAPSHOT'
     }
 
@@ -69,7 +76,7 @@ project(':util') {
     }
 }
 
-configure(subprojects.findAll {it.name != 'util'}) {
+configure(subprojects.findAll { it.name != 'util' }) {
     dependencies {
         testImplementation project(':util').sourceSets.main.output
         testImplementation project(':util').sourceSets.test.output
