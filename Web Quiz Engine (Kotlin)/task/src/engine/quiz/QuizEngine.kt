@@ -3,19 +3,19 @@ package engine.quiz
 import org.springframework.stereotype.Service
 
 interface QuizEngine {
-    fun getNew(): Quiz
+    fun add(quiz: Quiz): Quiz
     fun checkAnswer(answerIndex: Int): QuizResult
 }
 
 @Service
-class SingleQuizEngine : QuizEngine {
-    private val quiz = Quiz(
-        title = "The Java Logo",
-        text = "What is depicted on the Java logo?",
-        options = listOf("Robot", "Tea leaf", "Cup of coffee", "Bug")
-    )
+class DefaultQuizEngine : QuizEngine {
+    private val quizzes = mutableListOf<Quiz>()
 
-    override fun getNew() = quiz
+    override fun add(quiz: Quiz): Quiz {
+        val withAssignedId = quiz.copy(id = QuizId(quizzes.size.toUInt() + 1u))
+        quizzes.add(withAssignedId)
+        return withAssignedId
+    }
 
     override fun checkAnswer(answerIndex: Int): QuizResult =
         if (answerIndex == 2) QuizResult.success
